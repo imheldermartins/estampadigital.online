@@ -1,17 +1,17 @@
 import { SceneContainer } from "./Container";
+import { SceneContent } from "./Content";
+import { SceneIndex } from "./Default";
 
-const Root = {
+export default {
+    Root: SceneIndex,
     Container: SceneContainer,
+    Content: SceneContent,
 };
 
-interface SceneProps {
-    mesh?: string;
+export type ThreeScene = {
+    mesh: string;
+    width: number;
+    height: number;
 };
 
-export const Scene = (props: SceneProps) => {
-    return (
-        <Root.Container>
-            {props.mesh}
-        </Root.Container>
-    );
-}
+export const Scene = SceneIndex;

@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${notoSans.variable} bg-zinc-950 text-gray-50`}>
+      <body className={`${notoSans.variable} text-white`}>
         <AppContext>
           {children}
         </AppContext>

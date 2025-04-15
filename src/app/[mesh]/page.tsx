@@ -1,15 +1,12 @@
+import { PageRoute } from '@/types/PageRoute';
 import { CustomizerSection } from '../../sections/customizerSection';
 
-interface MeshPageProps {
-    params: {
-        mesh: string;
-    }
-};
+interface MeshPageProps extends PageRoute<{
+    mesh: string;
+}> { };
 
-export default function MeshPage({ params: { mesh } }: MeshPageProps) {
-    return (
-        <div className="flex flex-col font-[family-name:var(--font-noto-sans)]">
-            <CustomizerSection mesh={mesh} />
-        </div>
-    );
+export default function MeshPage({
+    params: { mesh }
+}: MeshPageProps) {
+    return <CustomizerSection mesh={mesh} />
 }
