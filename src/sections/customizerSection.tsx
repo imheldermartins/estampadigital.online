@@ -17,8 +17,8 @@ export const CustomizerSection = (props: CustomizerSectionProps) => {
 
     return (
         <div className={clsx('w-screen h-screen flex flex-col', pallete.bg[theme])}>
-            <main className="flex flex-1 flex-row">
-                <div className='flex items-center p-1'>
+            <main className="flex flex-1 flex-row justify-center relative">
+                <div className='bg-[#00000066] absolute w-full h-full flex items-center p-1 z-10'>
                     <Headline />
                 </div>
                 <Scene {...props} />

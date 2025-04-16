@@ -14,7 +14,7 @@ export const ThemeContext = createContext<ThemeContextType | null>(null);
 export const Theme = ({
     children
 }: DefaultProviderProps) => {
-    const [theme, setTheme] = useState<STATIC_COLORS>("yellow");
+    const [theme, setTheme] = useState<STATIC_COLORS>("black");
     return (
         <ThemeContext.Provider value={{ theme, setTheme }}>
             {children}
