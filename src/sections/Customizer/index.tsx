@@ -3,7 +3,7 @@
 import clsx from "clsx";
 
 import { Headline } from '@/components/Headline';
-import { Scene } from "@/components/Scene";
+import { Scene } from "@/sections/Customizer/shared";
 
 import { useTheme } from "@/contexts/Theme";
 import { pallete } from "@/utils/pallete";

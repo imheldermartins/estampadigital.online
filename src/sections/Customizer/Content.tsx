@@ -2,11 +2,11 @@ import React from "react";
 
 import * as THREE from "three";
 
-import { ThreeScene } from ".";
+import { ThreeScene } from "./Scene";
 
-import setThreeSizeScene from "./shared";
+import { setThreeSizeScene } from "./Scene/shared";
 
-import Mesh from "./Mesh";
+import Mesh from "./Scene/Mesh";
 
 interface SceneContentProps extends ThreeScene {
     setSize?: (width: number, height: number) => void;
@@ -24,7 +24,7 @@ export class SceneContent extends React.Component<SceneContentProps> {
     private height: number = 0;
     private mesh: string = "/assets/3d/cup-3d.glb";
 
-    private cube: THREE.Mesh | null = null;
+    // private cube: THREE.Mesh | null = null;
 
     constructor(props: SceneContentProps) {
         super(props);
@@ -72,12 +72,16 @@ export class SceneContent extends React.Component<SceneContentProps> {
             this.scene?.add(gltf.scene);
         });
 
-        // Cria um chão
+        // Creates Floor
+        const textureLoader = new THREE.TextureLoader();
+        const floorTexture = textureLoader.load("/assets/floor.png");
         const floorGeometry = new THREE.PlaneGeometry(5, 5);
         const floorMaterial = new THREE.MeshStandardMaterial({
+            map: floorTexture,
             color: 0xffffff,
-            roughness: 0.5,
-            metalness: 0.1
+            roughness: 0.8,
+            metalness: 0.1,
+            blending: THREE.AdditiveBlending,
         });
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 
@@ -93,10 +97,10 @@ export class SceneContent extends React.Component<SceneContentProps> {
     animate(): void {
         requestAnimationFrame(this.animate.bind(this));
 
-        if (this.cube) {
-            this.cube.rotation.x += 0.01;
-            this.cube.rotation.y += 0.01;
-        }
+        // if (this.cube) {
+        //     this.cube.rotation.x += 0.01;
+        //     this.cube.rotation.y += 0.01;
+        // }
 
         if (this.renderer && this.scene && this.camera) {
             this.renderer.render(this.scene, this.camera);

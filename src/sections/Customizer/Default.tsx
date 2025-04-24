@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Scene from ".";
+import Scene from "./shared";
 import { useTheme } from "@/contexts/Theme";
 
 interface SceneProps {

@@ -1,4 +1,4 @@
-import { CustomizerSection } from '../sections/customizerSection';
+import { CustomizerSection } from "@/sections/Customizer";
 
 export default function Home() {
   return <CustomizerSection />

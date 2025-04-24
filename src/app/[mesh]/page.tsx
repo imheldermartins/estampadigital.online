@@ -1,5 +1,5 @@
 import { PageRoute } from '@/types/PageRoute';
-import { CustomizerSection } from '../../sections/customizerSection';
+import { CustomizerSection } from '@/sections/Customizer';
 
 interface MeshPageProps extends PageRoute<{
     mesh: string;
