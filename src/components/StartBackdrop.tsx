@@ -12,7 +12,7 @@ export const StartBackdrop = ({ isActive = true, setIsActive }: StartBackdropPro
     const { theme } = useTheme();
 
     return (
-        <div className={clsx('bg-[rgba(0,0,0,0.5)] absolute w-full h-full flex flex-col justify-center items-start p-1 z-10', {
+        <div className={clsx('bg-[rgba(0,0,0,0.5)] absolute w-full h-full flex flex-col justify-center items-center md:items-start p-1 z-10', {
             'hidden': !isActive,
         })}>
             <Headline />

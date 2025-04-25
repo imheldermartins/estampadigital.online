@@ -36,7 +36,21 @@ const text = {
     "black": "text-zinc-950",
 };
 
+const hex = {
+    "red": "#F87171",
+    "green": "#34D399",
+    "blue": "#60A5FA",
+    "yellow": "#FBBF24",
+    "orange": "#F97316",
+    "purple": "#A78BFA",
+    "pink": "#F472B6",
+    "gray": "#6B7280",
+    "white": "#D1D5DB",
+    "black": "#111827",
+};
+
 export const pallete = {
     bg,
     text,
+    hex
 }

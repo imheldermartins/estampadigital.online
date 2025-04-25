@@ -2,12 +2,16 @@ import React from "react";
 
 import * as THREE from "three";
 
-import { setThreeSizeScene } from "./shared";
+import { parseHexColor, setThreeSizeScene } from "./shared";
 import { ThreeScene } from "../shared";
 import { SimpleMugMesh } from "./Mesh/Mug/SimpleMugMesh";
+import { STATIC_COLORS } from "@/utils/pallete";
+import FloorPlane from "./FloorPlane";
 
 interface SceneContentProps extends ThreeScene {
     setSize?: (width: number, height: number) => void;
+
+    theme: STATIC_COLORS;
 };
 
 export class SceneContent extends React.Component<SceneContentProps> {
@@ -17,6 +21,8 @@ export class SceneContent extends React.Component<SceneContentProps> {
     private renderer: THREE.WebGLRenderer | null = null;
     private camera: THREE.PerspectiveCamera | null = null;
     private scene: THREE.Scene | null = null;
+
+    private floorPlane: FloorPlane | null = null;
 
     private width: number = 0;
     private height: number = 0;
@@ -28,11 +34,11 @@ export class SceneContent extends React.Component<SceneContentProps> {
         this.scene = new THREE.Scene();
     }
 
-    load(): void {
+    private load(width: number, height: number): void {
         if (!this.domEl || !this.scene) return;
 
-        this.width = this.props.width;
-        this.height = this.props.height;
+        this.width = width;
+        this.height = height;
 
         this.camera = new THREE.PerspectiveCamera(
             100,
@@ -54,9 +60,11 @@ export class SceneContent extends React.Component<SceneContentProps> {
         this.domEl.appendChild(this.renderer.domElement);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        ambientLight.name = "ambientLight";
         this.scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+        directionalLight.name = "directionalLight";
         directionalLight.position.set(-5, 10, 5);
         directionalLight.castShadow = true;
         directionalLight.shadow.bias = -0.001;
@@ -70,29 +78,23 @@ export class SceneContent extends React.Component<SceneContentProps> {
             this.scene?.add(gltf.scene);
         });
 
-        // Creates Floor
-        const textureLoader = new THREE.TextureLoader();
-        const floorTexture = textureLoader.load("/assets/floor.png");
-        const floorGeometry = new THREE.PlaneGeometry(5, 5);
-        const floorMaterial = new THREE.MeshStandardMaterial({
-            map: floorTexture,
-            color: 0xffffff,
-            roughness: 0.8,
-            metalness: 0.1,
-            blending: THREE.AdditiveBlending,
-        });
-        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        /**
+         * Creates a floor plane with texture and without texture.
+        */
+        this.floorPlane = new FloorPlane(
+            "/assets/floor.png", this.props.theme,
+            (f1, f2) => {
+                if (!this.scene || !f1 || !f2) return;
 
-        floor.rotation.x = -Math.PI / 2;
-        floor.position.y = 0;
-        floor.receiveShadow = true;
-
-        this.scene.add(floor);
+                this.scene.add(f1);
+                this.scene.add(f2);
+            }
+        );
 
         this.animate();
     }
 
-    animate(): void {
+    private animate(): void {
         requestAnimationFrame(this.animate.bind(this));
 
         if (this.renderer && this.scene && this.camera) {
@@ -113,8 +115,44 @@ export class SceneContent extends React.Component<SceneContentProps> {
             this.props.height > 0 &&
             !this.renderer
         ) {
-            this.load();
+            this.load(this.props.width, this.props.height);
         }
+
+        if (this.props.theme !== prevProps.theme) {
+
+            if (!this.scene) return;
+
+            // Change floor color
+            const floorMtl = this.floorPlane?.getFloorPlane()?.material;
+
+            if (floorMtl) {
+                (floorMtl as THREE.MeshStandardMaterial).color.set(parseHexColor(this.props.theme));
+            }
+        }
+
+        // if (this.props.theme !== prevProps.theme) {
+
+        //     const newColor = parseHexColor(this.props.theme);
+
+        //     if (this.scene) {
+        //         const ambientLight = this.scene.getObjectByName("ambientLight") as THREE.AmbientLight;
+        //         if (ambientLight) {
+        //             ambientLight.color.set(newColor);  // Atualiza a cor da luz ambiente
+        //         }
+
+        //         const directionalLight = this.scene.getObjectByName("directionalLight") as THREE.DirectionalLight;
+        //         if (directionalLight) {
+        //             directionalLight.color.set(newColor);  // Atualiza a cor da luz direcional
+        //         }
+
+        //         const floor = this.scene.getObjectByName("floor") as THREE.Mesh;
+        //         if (floor) {
+        //             (floor.material as THREE.MeshStandardMaterial).color.set(newColor);  // Atualiza a cor do chão
+        //         }
+        //     }
+        // }
+
+        this.animate();
     }
 
     render() {

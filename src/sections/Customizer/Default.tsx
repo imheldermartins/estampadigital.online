@@ -30,6 +30,7 @@ export const SceneIndex = ({ mesh }: SceneProps) => {
                 width={sceneSize.width}
                 height={sceneSize.height}
                 mesh={`${mesh}`}
+                theme={theme}
                 setSize={setSize}
             />
         </Scene.Container>

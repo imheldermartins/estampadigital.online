@@ -1,3 +1,5 @@
+import { pallete } from "@/utils/pallete";
+
 function setThreeSizeScene(
     el: HTMLDivElement | null,
     setSize?: (width: number, height: number) => void
@@ -17,21 +19,9 @@ function setThreeSizeScene(
 }
 
 function parseHexColor(color: string): number {
-    if (color.startsWith("#")) {
-        return parseInt(color.slice(1), 16);
-    } else if (color.startsWith("0x")) {
-        return parseInt(color.slice(2), 16);
-    } else if (color.startsWith("rgb")) {
-        const rgb = color.match(/\d+/g);
-        if (rgb) {
-            return (
-                (parseInt(rgb[0]) << 16) |
-                (parseInt(rgb[1]) << 8) |
-                parseInt(rgb[2])
-            );
-        }
-    }
-    return 0xffffff; // Default to white if parsing fails
+    const hexColor = pallete.hex[color as keyof typeof pallete.hex] || color;
+
+    return parseInt(hexColor.replace("#", ""), 16);
 }
 
 

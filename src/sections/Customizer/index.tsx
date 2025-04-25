@@ -23,7 +23,7 @@ export const CustomizerSection = (props: CustomizerSectionProps) => {
     return (
         <div className={clsx('w-screen h-screen flex flex-col', pallete.bg[theme])}>
 
-            <ThemePicker />
+            {isActive && <ThemePicker />}
 
             <main className="flex flex-1 flex-row justify-center relative">
                 <StartBackdrop
@@ -31,7 +31,7 @@ export const CustomizerSection = (props: CustomizerSectionProps) => {
                     setIsActive={() => setIsActive(true)}
                 />
 
-                <Scene {...props} />
+                <Scene mesh={props.mesh} />
             </main>
 
             {!isActive && (
