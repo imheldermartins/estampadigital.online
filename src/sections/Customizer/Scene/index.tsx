@@ -12,11 +12,17 @@ interface SceneContentProps extends ThreeScene {
     setSize?: (width: number, height: number) => void;
 
     theme: STATIC_COLORS;
+    isActive?: boolean;
 };
 
 export class SceneContent extends React.Component<SceneContentProps> {
+
     /** Ref to the Three.js scene element. */
     private domEl: HTMLDivElement | null = null;
+
+    private width: number = 0;
+    private height: number = 0;
+    private mesh: string = "/assets/3d/cup-3d.glb";
 
     private renderer: THREE.WebGLRenderer | null = null;
     private camera: THREE.PerspectiveCamera | null = null;
@@ -24,9 +30,8 @@ export class SceneContent extends React.Component<SceneContentProps> {
 
     private floorPlane: FloorPlane | null = null;
 
-    private width: number = 0;
-    private height: number = 0;
-    private mesh: string = "/assets/3d/cup-3d.glb";
+
+    private nodeIsLoaded: boolean = false;
 
     constructor(props: SceneContentProps) {
         super(props);
@@ -34,18 +39,9 @@ export class SceneContent extends React.Component<SceneContentProps> {
         this.scene = new THREE.Scene();
     }
 
-    private load(width: number, height: number): void {
-        if (!this.domEl || !this.scene) return;
+    private init() {
 
-        this.width = width;
-        this.height = height;
-
-        this.camera = new THREE.PerspectiveCamera(
-            100,
-            this.width / this.height,
-            0.1,
-            10
-        );
+        this.camera = new THREE.PerspectiveCamera(100, this.width / this.height, 0.1, 10);
 
         // this.camera.position.set(0, 5, 0); // Caneca fica totalmente virada 90 graus
         this.camera.position.set(0, 1.5, 1.5);
@@ -55,9 +51,11 @@ export class SceneContent extends React.Component<SceneContentProps> {
 
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
 
-        this.renderer.setSize(this.width, this.height);
-        this.domEl.appendChild(this.renderer.domElement);
+    private loadResources(): void {
+
+        if (!this.scene) return;
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
         ambientLight.name = "ambientLight";
@@ -70,13 +68,6 @@ export class SceneContent extends React.Component<SceneContentProps> {
         directionalLight.shadow.bias = -0.001;
         directionalLight.shadow.mapSize.set(1024, 1024);
         this.scene.add(directionalLight);
-
-        const simpleMugMesh = new SimpleMugMesh(
-            new THREE.Vector3(0, 0, 0),
-        );
-        simpleMugMesh.loadMesh(this.mesh, (gltf) => {
-            this.scene?.add(gltf.scene);
-        });
 
         /**
          * Creates a floor plane with texture and without texture.
@@ -91,10 +82,35 @@ export class SceneContent extends React.Component<SceneContentProps> {
             }
         );
 
-        this.animate();
+        const simpleMugMesh = new SimpleMugMesh(
+            new THREE.Vector3(0, 0, 0),
+        );
+        simpleMugMesh.loadMesh(this.mesh, (gltf) => {
+            if (!this.scene) return;
+
+            this.scene.add(gltf.scene);
+        });
+    }
+
+    private resize(): void {
+
+        if (!this.domEl || !this.renderer || !this.camera) return;
+
+        setThreeSizeScene(this.domEl, (width, height) => {
+
+            this.props.setSize?.(width, height);
+            this.renderer!.setSize(this.width, this.height);
+            this.width = width;
+            this.height = height;
+        });
+
+
+        this.camera.aspect = this.width / this.height;
+        this.camera.updateProjectionMatrix();
     }
 
     private animate(): void {
+
         requestAnimationFrame(this.animate.bind(this));
 
         if (this.renderer && this.scene && this.camera) {
@@ -102,20 +118,25 @@ export class SceneContent extends React.Component<SceneContentProps> {
         }
     }
 
-    componentDidMount(): void {
-        if (!this.domEl) return;
 
-        setThreeSizeScene(this.domEl, this.props.setSize);
+    componentDidMount(): void {
+
+        this.init();
+        this.loadResources();
+        this.resize();
     }
 
     componentDidUpdate(prevProps: Readonly<SceneContentProps>): void {
-        if (
-            (this.props.width !== prevProps.width || this.props.height !== prevProps.height) &&
-            this.props.width > 0 &&
-            this.props.height > 0 &&
-            !this.renderer
-        ) {
-            this.load(this.props.width, this.props.height);
+
+        if (prevProps.isActive) {
+            this.resize();
+        }
+
+        if (!this.nodeIsLoaded && this.domEl && this.renderer) {
+
+            this.domEl?.appendChild(this.renderer.domElement);
+            this.resize();
+            this.nodeIsLoaded = true;
         }
 
         if (this.props.theme !== prevProps.theme) {
@@ -129,28 +150,6 @@ export class SceneContent extends React.Component<SceneContentProps> {
                 (floorMtl as THREE.MeshStandardMaterial).color.set(parseHexColor(this.props.theme));
             }
         }
-
-        // if (this.props.theme !== prevProps.theme) {
-
-        //     const newColor = parseHexColor(this.props.theme);
-
-        //     if (this.scene) {
-        //         const ambientLight = this.scene.getObjectByName("ambientLight") as THREE.AmbientLight;
-        //         if (ambientLight) {
-        //             ambientLight.color.set(newColor);  // Atualiza a cor da luz ambiente
-        //         }
-
-        //         const directionalLight = this.scene.getObjectByName("directionalLight") as THREE.DirectionalLight;
-        //         if (directionalLight) {
-        //             directionalLight.color.set(newColor);  // Atualiza a cor da luz direcional
-        //         }
-
-        //         const floor = this.scene.getObjectByName("floor") as THREE.Mesh;
-        //         if (floor) {
-        //             (floor.material as THREE.MeshStandardMaterial).color.set(newColor);  // Atualiza a cor do chão
-        //         }
-        //     }
-        // }
 
         this.animate();
     }

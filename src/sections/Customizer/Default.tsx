@@ -1,14 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Scene from "./shared";
 import { useTheme } from "@/contexts/Theme";
 
 interface SceneProps {
     mesh?: string;
-    width?: number;
-    height?: number;
+    isActive?: boolean;
 };
 
-export const SceneIndex = ({ mesh }: SceneProps) => {
+export const SceneIndex = ({ mesh, isActive }: SceneProps) => {
 
     const { theme } = useTheme();
 
@@ -24,6 +23,30 @@ export const SceneIndex = ({ mesh }: SceneProps) => {
         });
     };
 
+    useEffect(() => {
+
+        const handleResize = () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            setSceneSize({
+                width,
+                height,
+            });
+        };
+
+        if (isActive) {
+            handleResize();
+            window.addEventListener("resize", handleResize);
+        }
+
+        return () => {
+            if (isActive) {
+                window.removeEventListener("resize", handleResize);
+            }
+        };
+    }, [isActive]);
+
     return (
         <Scene.Container theme={theme} width={sceneSize.width} height={sceneSize.height}>
             <Scene.Content
@@ -32,6 +55,7 @@ export const SceneIndex = ({ mesh }: SceneProps) => {
                 mesh={`${mesh}`}
                 theme={theme}
                 setSize={setSize}
+                isActive={isActive}
             />
         </Scene.Container>
     );

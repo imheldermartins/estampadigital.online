@@ -31,7 +31,7 @@ export const CustomizerSection = (props: CustomizerSectionProps) => {
                     setIsActive={() => setIsActive(true)}
                 />
 
-                <Scene mesh={props.mesh} />
+                <Scene mesh={props.mesh} isActive={isActive} />
             </main>
 
             {!isActive && (
