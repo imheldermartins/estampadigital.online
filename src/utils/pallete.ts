@@ -19,8 +19,8 @@ const bg = {
     "purple": "bg-purple-500",
     "pink": "bg-pink-500",
     "gray": "bg-gray-500",
-    "white": "bg-white",
-    "black": "bg-black",
+    "white": "bg-gray-300",
+    "black": "bg-zinc-950",
 };
 
 const text = {
@@ -32,8 +32,8 @@ const text = {
     "purple": "text-purple-500",
     "pink": "text-pink-500",
     "gray": "text-gray-500",
-    "white": "text-white",
-    "black": "text-black",
+    "white": "text-gray-300",
+    "black": "text-zinc-950",
 };
 
 export const pallete = {

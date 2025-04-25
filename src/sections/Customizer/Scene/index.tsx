@@ -2,11 +2,9 @@ import React from "react";
 
 import * as THREE from "three";
 
-import { ThreeScene } from "./Scene";
-
-import { setThreeSizeScene } from "./Scene/shared";
-
-import Mesh from "./Scene/Mesh";
+import { setThreeSizeScene } from "./shared";
+import { ThreeScene } from "../shared";
+import { SimpleMugMesh } from "./Mesh/Mug/SimpleMugMesh";
 
 interface SceneContentProps extends ThreeScene {
     setSize?: (width: number, height: number) => void;
@@ -23,8 +21,6 @@ export class SceneContent extends React.Component<SceneContentProps> {
     private width: number = 0;
     private height: number = 0;
     private mesh: string = "/assets/3d/cup-3d.glb";
-
-    // private cube: THREE.Mesh | null = null;
 
     constructor(props: SceneContentProps) {
         super(props);
@@ -67,8 +63,10 @@ export class SceneContent extends React.Component<SceneContentProps> {
         directionalLight.shadow.mapSize.set(1024, 1024);
         this.scene.add(directionalLight);
 
-        const mesh = new Mesh.Mesh();
-        mesh.loadMesh(this.mesh, (gltf) => {
+        const simpleMugMesh = new SimpleMugMesh(
+            new THREE.Vector3(0, 0, 0),
+        );
+        simpleMugMesh.loadMesh(this.mesh, (gltf) => {
             this.scene?.add(gltf.scene);
         });
 
@@ -96,11 +94,6 @@ export class SceneContent extends React.Component<SceneContentProps> {
 
     animate(): void {
         requestAnimationFrame(this.animate.bind(this));
-
-        // if (this.cube) {
-        //     this.cube.rotation.x += 0.01;
-        //     this.cube.rotation.y += 0.01;
-        // }
 
         if (this.renderer && this.scene && this.camera) {
             this.renderer.render(this.scene, this.camera);

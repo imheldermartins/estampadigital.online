@@ -3,18 +3,28 @@ import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { VisualElement } from './VisualElement';
 
-
 class Mesh {
+
+    protected _position: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+    protected _rotation: THREE.Euler = new THREE.Euler(0, 0, 0);
+    protected _scale: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 
     protected obj: GLTF | null = null;
     protected visualElements: VisualElement[] = [];
     protected _colors: Array<number> = [];
 
+    constructor(pos?: THREE.Vector3, rot?: THREE.Euler, scale?: THREE.Vector3) {
+
+        this._position = pos || new THREE.Vector3(0, 0, 0);
+        this._rotation = rot || new THREE.Euler(0, 0, 0);
+        this._scale = scale || new THREE.Vector3(0.5, 0.5, 0.5);
+    }
+
     get scale() {
         if (this.obj) {
             return this.obj.scene.scale;
         }
-        return new THREE.Vector3(0, 0, 0);
+        return this._scale;
     }
 
     set scale(value: THREE.Vector3) {
@@ -28,7 +38,7 @@ class Mesh {
         if (this.obj) {
             return this.obj.scene.position;
         }
-        return new THREE.Vector3(0, 0, 0);
+        return this._position;
     }
 
     set position(value: THREE.Vector3) {
@@ -42,7 +52,7 @@ class Mesh {
         if (this.obj) {
             return this.obj.scene.rotation;
         }
-        return new THREE.Euler(0, 0, 0);
+        return this._rotation;
     }
 
     set rotation(value: THREE.Euler) {
@@ -72,9 +82,21 @@ class Mesh {
 
                 this.obj = gltf;
 
-                gltf.scene.position.set(0, 0, 0);
-                gltf.scene.scale.set(0, 0, 0);
-                gltf.scene.rotation.set(0, 0, 0);
+                gltf.scene.position.set(
+                    this._position.x,
+                    this._position.y,
+                    this._position.z
+                );
+                gltf.scene.scale.set(
+                    this._scale.x,
+                    this._scale.y,
+                    this._scale.z
+                );
+                gltf.scene.rotation.set(
+                    this._rotation.x,
+                    this._rotation.y + 1.5,
+                    this._rotation.z
+                );
 
                 gltf.scene.traverse((child) => {
                     if (child instanceof THREE.Mesh) {

@@ -1,11 +1,19 @@
-import { parseHexColor } from "../shared";
-import Mesh from "./Mesh";
+import Mesh from "../Mesh";
+
+import { parseHexColor } from "../../shared";
+
+import * as THREE from "three";
 
 abstract class MugModel extends Mesh {
 
     bodyColor: string = '#ffffff';
     handleColor: string = '#ffffff';
     innerColor: string = '#ffffff';
+
+    constructor(pos?: THREE.Vector3, rot?: THREE.Euler, scale?: THREE.Vector3) {
+
+        super(pos, rot, scale);
+    }
 
     get colors(): Array<number> {
 

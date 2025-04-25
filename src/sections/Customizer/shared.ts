@@ -1,5 +1,5 @@
 import { SceneContainer } from "./Container";
-import { SceneContent } from "./Content";
+import { SceneContent } from "./Scene/index";
 import { SceneIndex } from "./Default";
 
 export default {
