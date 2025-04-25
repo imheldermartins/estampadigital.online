@@ -121,14 +121,16 @@ export class SceneContent extends React.Component<SceneContentProps> {
 
     componentDidMount(): void {
 
-        this.init();
-        this.loadResources();
-        this.resize();
+        {
+            this.init();
+            this.loadResources();
+            this.resize();
+        }
     }
 
     componentDidUpdate(prevProps: Readonly<SceneContentProps>): void {
 
-        if (prevProps.isActive) {
+        if (this.props.isActive && !prevProps.isActive) {
             this.resize();
         }
 
