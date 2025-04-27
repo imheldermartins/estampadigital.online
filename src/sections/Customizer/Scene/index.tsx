@@ -2,11 +2,17 @@ import React from "react";
 
 import * as THREE from "three";
 
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 import { parseHexColor, setThreeSizeScene } from "./shared";
+
 import { ThreeScene } from "../shared";
-import { SimpleMugMesh } from "./Mesh/Mug/SimpleMugMesh";
 import { STATIC_COLORS } from "@/utils/pallete";
+
+import { SimpleMugMesh } from "./Mesh/Mug/SimpleMugMesh";
+
 import FloorPlane from "./FloorPlane";
+import Mesh from "./Mesh/Mesh";
 
 interface SceneContentProps extends ThreeScene {
     setSize?: (width: number, height: number) => void;
@@ -22,7 +28,6 @@ export class SceneContent extends React.Component<SceneContentProps> {
 
     private width: number = 0;
     private height: number = 0;
-    private mesh: string = "/assets/3d/cup-3d.glb";
 
     private renderer: THREE.WebGLRenderer | null = null;
     private camera: THREE.PerspectiveCamera | null = null;
@@ -30,8 +35,12 @@ export class SceneContent extends React.Component<SceneContentProps> {
 
     private floorPlane: FloorPlane | null = null;
 
-
     private nodeIsLoaded: boolean = false;
+
+    public mesh: Mesh | null = null;
+    private meshPath: string = "/assets/3d/cup-3d.glb";
+
+    public controls: OrbitControls | null = null;
 
     constructor(props: SceneContentProps) {
         super(props);
@@ -82,62 +91,122 @@ export class SceneContent extends React.Component<SceneContentProps> {
             }
         );
 
-        const simpleMugMesh = new SimpleMugMesh(
+        this.mesh = new SimpleMugMesh(
             new THREE.Vector3(0, 0, 0),
-        );
-        simpleMugMesh.loadMesh(this.mesh, (gltf) => {
+            new THREE.Euler(0, 0, 0),
+            new THREE.Vector3(0.5, 0.5, 0.5),
+        ) as Mesh;
+        this.mesh.loadMesh(this.meshPath, (gltf) => {
             if (!this.scene) return;
 
             this.scene.add(gltf.scene);
         });
     }
 
-    private resize(): void {
+    // private handleCameraXRotation(): void {
+
+    //     // Create eventListener to listen clientX only
+
+    //     const handleMouseDown = (event: MouseEvent) => {
+    //         if (!this.camera || !this.mesh) return;
+
+    //         this.camProps.isDragging = true;
+    //         this.camera.position.x = event.clientX / window.innerWidth * 2 - 1;
+    //         this.camera.position.y = event.clientY / window.innerHeight * 2 - 1;
+    //     };
+
+    //     const handleMouseMove = (event: MouseEvent) => {
+
+    //         // Not update Y coordinate, only X coordinate
+    //         if (!this.camProps.isDragging || !this.camera || !this.mesh) return;
+
+    //         const deltaX = event.clientX - this.camProps.lastXPos;
+    //         this.camProps.lastXPos = event.clientX;
+    //         this.camera.position.x += deltaX * 0.01; // Adjust the sensitivity as needed
+
+    //         this.camera.position.x = Math.max(-1, Math.min(1, this.camera.position.x)); // Clamp the value between -1 and 1
+    //     };
+
+    //     const handleMouseUp = () => {
+    //         this.camProps.isDragging = false;
+    //     };
+
+    //     window.addEventListener("mousedown", handleMouseDown);
+    //     window.addEventListener("mousemove", handleMouseMove);
+    //     window.addEventListener("mouseup", handleMouseUp);
+    //     window.addEventListener("mouseleave", handleMouseUp);
+    //     // window.addEventListener("touchmove", () => {}, false);
+    // }
+
+    private resize(width: number, height: number): void {
 
         if (!this.domEl || !this.renderer || !this.camera) return;
 
-        setThreeSizeScene(this.domEl, (width, height) => {
+        if (width !== this.width || height !== this.height) {
 
-            this.props.setSize?.(width, height);
-            this.renderer!.setSize(this.width, this.height);
             this.width = width;
             this.height = height;
+        }
+
+        setThreeSizeScene(this.domEl, (_width, _height) => {
+
+            if (!this.renderer || !this.camera) return;
+
+            this.width = _width;
+            this.height = _height;
+
+            this.props.setSize?.(_width, _height);
+            this.renderer.setSize(_width, _height);
+
+            this.camera.aspect = _width / _height;
+            this.camera.updateProjectionMatrix();
         });
-
-
-        this.camera.aspect = this.width / this.height;
-        this.camera.updateProjectionMatrix();
     }
 
     private animate(): void {
 
         requestAnimationFrame(this.animate.bind(this));
 
+        if (this.mesh && !this.props.isActive)
+            this.mesh.rotation.y += 0.001;
+        else {
+
+            if (!this.controls) {
+                this.controls = new OrbitControls(this.camera!, this.domEl!);
+                // this.camera!.position.z = 2;
+
+                // this.controls.enableDamping = true;
+                // this.controls.enableZoom = false;
+                this.controls?.update();
+            }
+        }
+
         if (this.renderer && this.scene && this.camera) {
             this.renderer.render(this.scene, this.camera);
         }
     }
 
-
     componentDidMount(): void {
 
-        {
-            this.init();
-            this.loadResources();
-            this.resize();
-        }
+        this.init();
+        this.loadResources();
+        this.resize(this.width, this.height);
     }
 
     componentDidUpdate(prevProps: Readonly<SceneContentProps>): void {
 
-        if (this.props.isActive && !prevProps.isActive) {
-            this.resize();
+        console.log('mesh colors >>', this.mesh?.colors);
+
+        if (this.props.isActive !== prevProps.isActive) {
+
+            this.resize(this.props.width, this.props.height);
+            this.mesh!.rotation = new THREE.Euler(0, 1.5, 0);
         }
 
         if (!this.nodeIsLoaded && this.domEl && this.renderer) {
 
             this.domEl?.appendChild(this.renderer.domElement);
-            this.resize();
+            this.resize(this.props.width, this.props.height);
             this.nodeIsLoaded = true;
         }
 

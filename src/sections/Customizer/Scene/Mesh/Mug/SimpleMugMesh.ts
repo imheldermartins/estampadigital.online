@@ -8,14 +8,6 @@ class SimpleMugMesh extends MugModel {
 
         super(pos, rot, scale);
     }
-
-    get colors(): Array<number> {
-        return [
-            0x000000,
-            0x000000,
-            0x000000
-        ];
-    }
 }
 
 export { SimpleMugMesh };

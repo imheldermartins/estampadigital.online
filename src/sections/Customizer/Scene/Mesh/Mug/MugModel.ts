@@ -11,7 +11,6 @@ abstract class MugModel extends Mesh {
     innerColor: string = '#ffffff';
 
     constructor(pos?: THREE.Vector3, rot?: THREE.Euler, scale?: THREE.Vector3) {
-
         super(pos, rot, scale);
     }
 

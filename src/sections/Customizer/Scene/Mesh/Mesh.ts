@@ -7,7 +7,7 @@ class Mesh {
 
     protected _position: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
     protected _rotation: THREE.Euler = new THREE.Euler(0, 0, 0);
-    protected _scale: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+    protected _scale: THREE.Vector3 = new THREE.Vector3(0.5, 0.5, 0.5);
 
     protected obj: GLTF | null = null;
     protected visualElements: VisualElement[] = [];
@@ -15,9 +15,9 @@ class Mesh {
 
     constructor(pos?: THREE.Vector3, rot?: THREE.Euler, scale?: THREE.Vector3) {
 
-        this._position = pos || new THREE.Vector3(0, 0, 0);
-        this._rotation = rot || new THREE.Euler(0, 0, 0);
-        this._scale = scale || new THREE.Vector3(0.5, 0.5, 0.5);
+        this._position = pos || this._position;
+        this._rotation = rot || this._rotation;
+        this._scale = scale || this._position;
     }
 
     get scale() {
