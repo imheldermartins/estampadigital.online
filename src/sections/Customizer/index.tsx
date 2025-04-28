@@ -10,6 +10,7 @@ import { pallete } from "@/utils/pallete";
 import { ThemePicker } from "@/components/ThemePicker";
 import { StartBackdrop } from "@/components/StartBackdrop";
 import { useState } from "react";
+import { ImagePicker } from "@/components/ImagePicker";
 
 interface CustomizerSectionProps {
     mesh?: string;
@@ -23,7 +24,14 @@ export const CustomizerSection = (props: CustomizerSectionProps) => {
     return (
         <div className={clsx('w-screen h-screen flex flex-col', pallete.bg[theme])}>
 
-            {isActive && <ThemePicker />}
+            {isActive && (
+                <>
+                    <ThemePicker />
+                    {/* <div className="absolute top-0 left-0 w-full h-[10vh] py-2 text-center flex flex-row gap-2 items-center justify-center z-10">
+                        <ImagePicker />
+                    </div> */}
+                </>
+            )}
 
             <main className="flex flex-1 flex-row justify-center relative">
                 <StartBackdrop
