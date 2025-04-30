@@ -2,15 +2,12 @@
 
 import clsx from "clsx";
 
-import { Headline } from '@/components/Headline';
 import { Scene } from "@/sections/Customizer/shared";
 
 import { useTheme } from "@/contexts/Theme";
 import { pallete } from "@/utils/pallete";
-import { ThemePicker } from "@/components/ThemePicker";
 import { StartBackdrop } from "@/components/StartBackdrop";
 import { useState } from "react";
-import { ImagePicker } from "@/components/ImagePicker";
 
 interface CustomizerSectionProps {
     mesh?: string;

@@ -3,7 +3,18 @@ import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { VisualElement } from './VisualElement';
 
-class Mesh {
+export interface IMesh {
+    position: THREE.Vector3;
+    rotation: THREE.Euler;
+    scale: THREE.Vector3;
+    colors: Array<number>;
+    groups: THREE.Group | null;
+    materials: THREE.Material[] | null;
+    texturedMaterials: (THREE.Material | THREE.MeshStandardMaterial)[];
+    changeTexture(file: File, name?: string, onChangeTexture?: (visualElement: VisualElement[]) => void): VisualElement[] | void;
+};
+
+class Mesh implements IMesh {
 
     protected _position: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
     protected _rotation: THREE.Euler = new THREE.Euler(0, 0, 0);
@@ -159,7 +170,7 @@ class Mesh {
         });
     }
 
-    public changeTexture(file: File, name?: string, onChangeTexture?: (visualElement: VisualElement[]) => void): VisualElement[] | void {
+    public changeTexture(file: File, name?: string, _?: (visualElement: VisualElement[]) => void): VisualElement[] | void {
 
         console.log(`File[${name || 'texture'}] loaded:\n`, file);
     }

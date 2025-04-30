@@ -1,12 +1,17 @@
-import { PageRoute } from '@/types/PageRoute';
+// import { PageRoute } from '@/types/PageRoute';
 import { CustomizerSection } from '@/sections/Customizer';
 
-interface MeshPageProps extends PageRoute<{
-    mesh: string;
-}> { };
+// type MeshPageProps = PageRoute<{
+//     mesh: string;
+// }>;
 
-export default function MeshPage({
-    params: { mesh }
-}: MeshPageProps) {
+export default async function MeshPage({
+    params
+}: {
+    params: Promise<{ mesh: string }>
+}) {
+
+    const { mesh } = await params;
+
     return <CustomizerSection mesh={mesh} />
 }
