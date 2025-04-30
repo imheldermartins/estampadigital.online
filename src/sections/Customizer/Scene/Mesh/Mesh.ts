@@ -11,8 +11,9 @@ class Mesh {
 
     protected obj: GLTF | null = null;
 
-    protected _visualElements: VisualElement[] = [];
     protected _colors: Array<number> = [];
+
+    public visualElements: VisualElement[] = [];
 
     constructor(pos?: THREE.Vector3, rot?: THREE.Euler, scale?: THREE.Vector3) {
 
@@ -156,6 +157,11 @@ class Mesh {
 
             return null;
         });
+    }
+
+    public changeTexture(file: File, name?: string, onChangeTexture?: (visualElement: VisualElement[]) => void): VisualElement[] | void {
+
+        console.log(`File[${name || 'texture'}] loaded:\n`, file);
     }
 
 }

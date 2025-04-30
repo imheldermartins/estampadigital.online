@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 type ConstructorParams = {
+    id?: string;
     texture?: THREE.Texture | null;
     size?: number;
     position?: 'front' | 'back';
@@ -10,6 +11,7 @@ type ConstructorParams = {
 
 class VisualElement {
 
+    public id: string = crypto.randomUUID();
     public texture: THREE.Texture | null = null;
     public size: number = 0;
     public position: 'front' | 'back' = 'front';
@@ -17,11 +19,12 @@ class VisualElement {
     public isTransparent: boolean = true;
 
     constructor({ position = 'front', size = 0, ...props }: Partial<ConstructorParams>) {
+        this.id = props.id || this.id;
         this.size = size;
         this.position = position;
-        this.texture = props.texture || new THREE.Texture();
-        this.color = props.color || 0;
-        this.isTransparent = props.isTransparent || true;
+        this.texture = props.texture || this.texture;
+        this.color = props.color || this.color;
+        this.isTransparent = props.isTransparent || this.isTransparent;
     }
 };
 

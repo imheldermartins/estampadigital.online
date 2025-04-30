@@ -22,6 +22,12 @@ abstract class MugModel extends Mesh {
             parseHexColor(this.innerColor)
         ];
     }
+
+    public changeLogoTexture(file?: File): void {
+        // const texture = new THREE.TextureLoader().load(newTexPath);
+
+        console.log('materials >> ', this.materials);
+    }
 }
 
 export default MugModel;

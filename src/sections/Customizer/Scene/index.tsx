@@ -16,6 +16,7 @@ import Mesh from "./Mesh/Mesh";
 // import { ImagePicker } from "@/components/ImagePicker";
 import { VisualElement } from "./Mesh/VisualElement";
 import { createVisualElementsFromMesh, imageBitmapToDataURL } from "./Mesh/utils";
+import { ImagePicker } from "@/components/ImagePicker";
 
 interface SceneContentState {
     visualElements: VisualElement[];
@@ -105,48 +106,13 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
             new THREE.Vector3(0, 0.01, 0),
             new THREE.Euler(0, 0, 0),
             new THREE.Vector3(0.5, 0.5, 0.5),
-        ) as Mesh;
+        );
         this.mesh.loadMesh(this.meshPath, (gltf) => {
             if (!this.scene) return;
 
             this.scene.add(gltf.scene);
         });
     }
-
-    // private handleCameraXRotation(): void {
-
-    //     // Create eventListener to listen clientX only
-
-    //     const handleMouseDown = (event: MouseEvent) => {
-    //         if (!this.camera || !this.mesh) return;
-
-    //         this.camProps.isDragging = true;
-    //         this.camera.position.x = event.clientX / window.innerWidth * 2 - 1;
-    //         this.camera.position.y = event.clientY / window.innerHeight * 2 - 1;
-    //     };
-
-    //     const handleMouseMove = (event: MouseEvent) => {
-
-    //         // Not update Y coordinate, only X coordinate
-    //         if (!this.camProps.isDragging || !this.camera || !this.mesh) return;
-
-    //         const deltaX = event.clientX - this.camProps.lastXPos;
-    //         this.camProps.lastXPos = event.clientX;
-    //         this.camera.position.x += deltaX * 0.01; // Adjust the sensitivity as needed
-
-    //         this.camera.position.x = Math.max(-1, Math.min(1, this.camera.position.x)); // Clamp the value between -1 and 1
-    //     };
-
-    //     const handleMouseUp = () => {
-    //         this.camProps.isDragging = false;
-    //     };
-
-    //     window.addEventListener("mousedown", handleMouseDown);
-    //     window.addEventListener("mousemove", handleMouseMove);
-    //     window.addEventListener("mouseup", handleMouseUp);
-    //     window.addEventListener("mouseleave", handleMouseUp);
-    //     // window.addEventListener("touchmove", () => {}, false);
-    // }
 
     private resize(width: number, height: number): void {
 
@@ -212,10 +178,10 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
             this.mesh!.rotation = new THREE.Euler(0, 1.5, 0);
 
             {
-                const visualElements = createVisualElementsFromMesh(this.mesh!);
-                console.log('visualElements: ', visualElements);
+                this.mesh!.visualElements = createVisualElementsFromMesh(this.mesh!);
+                // console.log('visualElements: ', visualElements);
 
-                this.setState({ visualElements });
+                this.setState({ visualElements: this.mesh!.visualElements });
             }
         }
 
@@ -251,22 +217,30 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
                     className="w-full h-full"
                 />
                 {/* Se existir mesh e visualElements, renderiza cada VisualElement */}
-                {this.state.visualElements && (
+                {this.state.visualElements.length > 0 && (
                     <div className="absolute top-0 right-0 p-4 flex flex-col gap-2">
                         {this.state.visualElements.map((element, index) => (
-                            <div
-                                key={index}
-                                className="w-16 h-16 rounded-lg border border-gray-300 flex items-center justify-center text-xs text text-red-500"
-                                style={{
-                                    backgroundColor: `#${element.color.toString(16).padStart(6, '0')}`,
-                                }}
-                            >
-                                {/* {element.position} */}
-                                <img
-                                    src={imageBitmapToDataURL(element.texture?.image as ImageBitmap)}
-                                    alt="Texture preview"
-                                    className="w-16 h-16"
-                                />
+                            <div key={index} className="flex flex-col items-end gap-2">
+                                <div
+                                    className="w-48 h-16 rounded-lg border border-indigo-500 flex items-center justify-center text-xs text text-red-500"
+                                    style={{
+                                        backgroundColor: `#${element.color.toString(16).padStart(6, '0')}`,
+                                    }}
+                                >
+                                    <img
+                                        src={imageBitmapToDataURL(element.texture?.image as ImageBitmap)}
+                                        alt="Texture preview"
+                                        className="max-w-full max-h-full flex-1 transform -scale-x-100"
+                                    />
+                                </div>
+                                <ImagePicker title={`Mudar ${element.id}`} onChange={(file) => {
+
+                                    if (!this.mesh) return;
+
+                                    this.mesh.changeTexture(file, element.id, (visualElements) => {
+                                        this.setState({ visualElements });
+                                    });
+                                }} />
                             </div>
                         ))}
                     </div>

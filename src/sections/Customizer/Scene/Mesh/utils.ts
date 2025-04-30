@@ -11,6 +11,7 @@ export function createVisualElementsFromMesh(mesh: Mesh): VisualElement[] {
     texturedMaterials.forEach((mtl) => {
         visualElements.push(
             new VisualElement({
+                id: mtl.name,
                 texture: mtl.map,
                 color: mtl.color.getHex(),
                 isTransparent: mtl.transparent,
