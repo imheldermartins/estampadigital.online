@@ -2,7 +2,7 @@ import { useTheme } from "@/contexts/Theme";
 import { pallete, STATIC_COLORS } from "@/utils/pallete";
 import clsx from "clsx";
 
-export const ThemePicker = () => {
+export const ThemePicker = ({ onChange }: { onChange: (theme: STATIC_COLORS) => void }) => {
 
     const { theme, setTheme } = useTheme();
     const colors = Object.keys(pallete.bg) as STATIC_COLORS[];
@@ -20,8 +20,10 @@ export const ThemePicker = () => {
                             { "ring ring-white ring-offset-2": theme === color }
                         )}
                         onClick={() => {
-                            if (theme !== color)
+                            if (theme !== color) {
                                 setTheme(color)
+                                onChange(color)
+                            }
                         }}
                     />
                 </div>

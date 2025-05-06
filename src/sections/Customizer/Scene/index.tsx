@@ -15,8 +15,11 @@ import FloorPlane from "./FloorPlane";
 import Mesh from "./Mesh/Mesh";
 // import { ImagePicker } from "@/components/ImagePicker";
 import { VisualElement } from "./Mesh/VisualElement";
-import { createVisualElementsFromMesh, imageBitmapToDataURL } from "./Mesh/utils";
-import { ImagePicker } from "@/components/ImagePicker";
+import { createVisualElementsFromMesh } from "./Mesh/utils";
+// import { ImagePicker } from "@/components/ImagePicker";
+import { ImagePreview } from "@/components/ImagePreview";
+import { ThemePicker } from "@/components/ThemePicker";
+import { DualColorMugMesh } from "./Mesh/Mug/DualColorMugMesh";
 
 interface SceneContentState {
     visualElements: VisualElement[];
@@ -27,6 +30,7 @@ interface SceneContentProps extends ThreeScene {
 
     theme: STATIC_COLORS;
     isActive?: boolean;
+    typeMesh?: 'simpleMug' | 'dualColorMug' | 't-shirt';
 };
 
 export class SceneContent extends React.Component<SceneContentProps, SceneContentState> {
@@ -77,11 +81,11 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
 
         if (!this.scene) return;
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         ambientLight.name = "ambientLight";
         this.scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
         directionalLight.name = "directionalLight";
         directionalLight.position.set(-5, 10, 5);
         directionalLight.castShadow = true;
@@ -102,12 +106,30 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
             }
         );
 
-        this.mesh = new SimpleMugMesh(
-            new THREE.Vector3(0, 0.01, 0),
-            new THREE.Euler(0, 0, 0),
-            new THREE.Vector3(0.5, 0.5, 0.5),
-        );
-        this.mesh.loadMesh(this.meshPath, (gltf) => {
+        switch (this.props.typeMesh) {
+            case 'simpleMug':
+                this.mesh = new SimpleMugMesh(
+                    new THREE.Vector3(0, 0.01, 0),
+                    new THREE.Euler(0, 0, 0),
+                    new THREE.Vector3(0.5, 0.5, 0.5),
+                );
+                break;
+            case 'dualColorMug':
+                this.mesh = new DualColorMugMesh(
+                    new THREE.Vector3(0, 0.01, 0),
+                    new THREE.Euler(0, 0, 0),
+                    new THREE.Vector3(0.5, 0.5, 0.5),
+                );
+                break;
+            default:
+                this.mesh = new DualColorMugMesh(
+                    new THREE.Vector3(0, 0.01, 0),
+                    new THREE.Euler(0, 0, 0),
+                    new THREE.Vector3(0.5, 0.5, 0.5),
+                );
+        }
+
+        this.mesh!.loadMesh(this.meshPath, (gltf) => {
             if (!this.scene) return;
 
             this.scene.add(gltf.scene);
@@ -149,10 +171,7 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
 
             if (!this.controls) {
                 this.controls = new OrbitControls(this.camera!, this.domEl!);
-                // this.camera!.position.z = 2;
 
-                // this.controls.enableDamping = true;
-                // this.controls.enableZoom = false;
                 this.controls?.update();
             }
         }
@@ -177,12 +196,8 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
             this.resize(this.props.width, this.props.height);
             this.mesh!.rotation = new THREE.Euler(0, 1.5, 0);
 
-            {
-                this.mesh!.visualElements = createVisualElementsFromMesh(this.mesh!);
-                // console.log('visualElements: ', visualElements);
-
-                this.setState({ visualElements: this.mesh!.visualElements });
-            }
+            this.mesh!.visualElements = createVisualElementsFromMesh(this.mesh!);
+            this.setState({ visualElements: this.mesh!.visualElements });
         }
 
         if (!this.nodeIsLoaded && this.domEl && this.renderer) {
@@ -216,34 +231,26 @@ export class SceneContent extends React.Component<SceneContentProps, SceneConten
                     }}
                     className="w-full h-full"
                 />
-                {/* Se existir mesh e visualElements, renderiza cada VisualElement */}
+                {this.props.isActive && (
+                    <ThemePicker onChange={(theme) => {
+                        if (this.props.typeMesh === 'dualColorMug') {
+                            (this.mesh! as DualColorMugMesh).changeSecondayColor(theme);
+                        }
+                    }} />
+                )}
+                {/* Render each VisualElement present on Mesh */}
                 {this.state.visualElements.length > 0 && (
-                    <div className="absolute top-0 right-0 p-4 flex flex-col gap-2">
-                        {this.state.visualElements.map((element, index) => (
-                            <div key={index} className="flex flex-col items-end gap-2">
-                                <div
-                                    className="w-48 h-16 rounded-lg border border-indigo-500 flex items-center justify-center text-xs text text-red-500"
-                                    style={{
-                                        backgroundColor: `#${element.color.toString(16).padStart(6, '0')}`,
-                                    }}
-                                >
-                                    <img
-                                        src={imageBitmapToDataURL(element.texture?.image as ImageBitmap)}
-                                        alt="Texture preview"
-                                        className="max-w-full max-h-full flex-1 transform -scale-x-100"
-                                    />
-                                </div>
-                                <ImagePicker title={`Mudar ${element.id}`} onChange={(file) => {
+                    <ImagePreview
+                        visualElements={this.state.visualElements}
+                        onChange={(file, id) => {
 
-                                    if (!this.mesh) return;
+                            if (!this.mesh) return;
 
-                                    this.mesh.changeTexture(file, element.id, (visualElements) => {
-                                        this.setState({ visualElements });
-                                    });
-                                }} />
-                            </div>
-                        ))}
-                    </div>
+                            this.mesh.changeTexture(file, id, (visualElements) => {
+                                this.setState({ visualElements });
+                            });
+                        }}
+                    />
                 )}
             </>
         );

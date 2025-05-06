@@ -56,6 +56,7 @@ export const SceneIndex = ({ mesh, isActive }: SceneProps) => {
                 theme={theme}
                 setSize={setSize}
                 isActive={isActive}
+                typeMesh="dualColorMug"
             />
         </Scene.Container>
     );

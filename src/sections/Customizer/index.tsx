@@ -8,6 +8,7 @@ import { useTheme } from "@/contexts/Theme";
 import { pallete } from "@/utils/pallete";
 import { StartBackdrop } from "@/components/StartBackdrop";
 import { useState } from "react";
+// import { ImageEditor } from "@/components/ImageEditor";
 
 interface CustomizerSectionProps {
     mesh?: string;
@@ -37,6 +38,7 @@ export const CustomizerSection = (props: CustomizerSectionProps) => {
                 />
 
                 <Scene mesh={props.mesh} isActive={isActive} />
+                {/* <ImageEditor /> */}
             </main>
 
             {!isActive && (

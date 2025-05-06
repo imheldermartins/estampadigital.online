@@ -1,6 +1,7 @@
 import { useRef } from "react";
 
 import { Icon } from "@iconify/react";
+import { Button } from "./Button";
 
 interface ImagePickerProps {
     title?: string;
@@ -19,14 +20,11 @@ export const ImagePicker = ({ title = 'Faça o upload de uma imagem.', onChange 
 
     return (
         <>
-            <button
-                className="px-3 py-1.5 md:py-2 cursor-pointer flex items-center justify-center rounded-lg bg-gradient-to-bl from-indigo-300 to-indigo-600 hover:from-indigo-400 hover:to-indigo-700 transition-all duration-200 ease-in-out"
-                onClick={() => inputRef.current?.click()}
-            >
-                <Icon icon="mdi:image-outline" className="text-white" width={24} height={24} />
+            <Button onClick={() => inputRef.current?.click()}>
+                <Icon icon="mdi:image-outline" className="text-white mr-1" width={24} height={24} />
 
                 <span className="text-white font-semibold text-sm md:text-base px-2">{title}</span>
-            </button>
+            </Button>
             <input
                 ref={inputRef}
                 type="file"
